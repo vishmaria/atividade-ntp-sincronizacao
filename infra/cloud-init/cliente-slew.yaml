@@ -2,7 +2,6 @@
 # cloud-init para ntp-cliente-slew (slew PURO).
 # Diferenca em relacao ao cliente-step.yaml: chrony.conf NAO contem makestep.
 
-package_update: true
 packages:
   - chrony
 

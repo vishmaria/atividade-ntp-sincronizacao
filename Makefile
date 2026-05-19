@@ -12,7 +12,7 @@ SHELL := /usr/bin/env bash
 SCRIPTS := infra/scripts
 PYTHON ?= python3
 
-.PHONY: up up-b logs plot down clean help
+.PHONY: up up-b logs plot down clean purge help
 
 help:
 	@echo "Targets disponiveis:"
@@ -21,7 +21,8 @@ help:
 	@echo "  make logs     coleta CSVs das VMs para ./logs/"
 	@echo "  make plot     gera grafico convergencia.png"
 	@echo "  make down     pausa as VMs (sem destruir)"
-	@echo "  make clean    destroi todas as VMs ntp-* e remove ./logs/"
+	@echo "  make clean    destroi VMs (preserva template; re-run rapido)"
+	@echo "  make purge    destroi TUDO incluindo template"
 
 up:
 	@$(SCRIPTS)/launch.sh
@@ -44,4 +45,13 @@ down:
 clean:
 	@$(SCRIPTS)/destroy.sh
 	@rm -rf logs
-	@echo "[clean] logs/ removido."
+	@echo "[clean] logs/ removido. Template preservado."
+
+purge:
+	@for vm in $$(multipass list --format csv | awk -F',' 'NR>1 && $$1 ~ /^ntp-/ {print $$1}'); do \
+	  echo "[purge] removendo $$vm..."; \
+	  multipass delete $$vm; \
+	done
+	@multipass purge
+	@rm -rf logs
+	@echo "[purge] tudo removido (inclusive ntp-template)."

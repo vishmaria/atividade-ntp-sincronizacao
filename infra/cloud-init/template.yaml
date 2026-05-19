@@ -1,33 +1,18 @@
 #cloud-config
-# cloud-init para ntp-servidor.
-# Instala chrony, escreve config e instala logger CSV via systemd unit.
+# cloud-init para ntp-template — VM base clonada para todos os papeis.
+# Instala chrony + logger systemd unit (disabled). O papel concreto
+# (servidor / cliente-step / cliente-slew) e aplicado depois do clone
+# via apply-role.sh.
 
 packages:
   - chrony
 
 write_files:
-  - path: /etc/chrony/chrony.conf
-    permissions: '0644'
-    owner: root:root
-    content: |
-      # chrony-servidor.conf — servidor NTP da subrede multipass
-      pool 2.pool.ntp.org iburst maxsources 4
-      allow 10.0.0.0/8
-      allow 192.168.0.0/16
-      allow 172.16.0.0/12
-      local stratum 8
-      makestep 1.0 3
-      driftfile /var/lib/chrony/drift
-      rtcsync
-      logdir /var/log/chrony
-      log measurements statistics tracking
-
   - path: /usr/local/bin/log-offset.sh
     permissions: '0755'
     owner: root:root
     content: |
       #!/bin/bash
-      # log-offset.sh — appendar 1 linha/s ao CSV com metricas de chronyc tracking.
       HOSTNAME=$(hostname)
       CSV=/var/log/chrony/offset-${HOSTNAME}.csv
       if [ ! -f "$CSV" ]; then
@@ -62,7 +47,5 @@ write_files:
       WantedBy=multi-user.target
 
 runcmd:
-  - systemctl enable chrony
-  - systemctl restart chrony
   - systemctl daemon-reload
-  - systemctl enable --now log-offset.service
+  # chrony fica instalado mas ainda nao configurado; apply-role.sh fara isso.

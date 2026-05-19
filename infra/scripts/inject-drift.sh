@@ -27,8 +27,21 @@ multipass exec "${VM}" -- sudo systemctl stop chrony
 log "Desabilitando NTP no systemd-timedated..."
 multipass exec "${VM}" -- sudo timedatectl set-ntp false
 
-# Calcula novo tempo (relativo ao relogio do host) e empurra para a VM.
-NOVO=$(date -u -d "${OFFSET} seconds" '+%Y-%m-%d %H:%M:%S')
+# Calcula novo tempo. Aceita OFFSET com sinal (+30, -45, 30).
+# Detecta GNU date (Linux, Git Bash no Windows) vs BSD date (macOS).
+if date --version >/dev/null 2>&1; then
+  # GNU date: aceita "+30 seconds" ou "-45 seconds" diretamente.
+  NOVO=$(date -u -d "${OFFSET} seconds" '+%Y-%m-%d %H:%M:%S')
+else
+  # BSD date (macOS): precisa sinal SEM duplicacao.
+  # Garante exatamente um sinal no inicio: remove + se houver, depois prefixa.
+  CLEAN="${OFFSET#+}"   # remove + leading se existir
+  case "${CLEAN}" in
+    -*) ARG="${CLEAN}S" ;;   # ja tem - (negativo)
+    *)  ARG="+${CLEAN}S" ;;  # positivo: prefixa +
+  esac
+  NOVO=$(date -u -v "${ARG}" '+%Y-%m-%d %H:%M:%S')
+fi
 log "Aplicando offset ${OFFSET}s em ${VM} (novo tempo UTC: ${NOVO})..."
 multipass exec "${VM}" -- sudo timedatectl set-time "${NOVO}"
 

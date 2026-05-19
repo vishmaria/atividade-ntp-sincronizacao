@@ -3,7 +3,6 @@
 # A diretiva `server SERVIDOR_IP` e substituida pelo launch.sh antes do
 # multipass launch (sed do template).
 
-package_update: true
 packages:
   - chrony
 
