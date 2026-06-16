@@ -1,8 +1,8 @@
 # Relatório — Atividade Prática: Sincronização de Relógios com NTP/chrony
 
-**Disciplina:**
-**Dupla:** /
-**Data:**
+**Disciplina:** INE5418
+**Dupla:** Maria Fernanda Bittelbrunn Toniasso /
+**Data:** 16/06/2026
 
 ---
 
@@ -138,9 +138,23 @@ Cole um trecho do log que evidencia um **slew** (correção pequena, contínua, 
 
 ## Observações livres
 
-_(Comportamentos inesperados, erros encontrados, dificuldades técnicas — descreva o que aconteceu e como você resolveu)_
+_Não foi possível executar a atividade devido a um erro no carregamento do ntp. Retorno no terminal (Fedora 44):_
 
->
+```bash
+make up   
+[launch] ntp-template ja existe.
+[launch] Clonando ntp-template -> ntp-servidor...
+Cloned from ntp-template to ntp-servidor.
+[launch] Clonando ntp-template -> ntp-cliente-1...
+Cloned from ntp-template to ntp-cliente-1.
+[launch] Clonando ntp-template -> ntp-cliente-2...
+Cloned from ntp-template to ntp-cliente-2.
+[launch] Iniciando ntp-servidor...
+start failed: The following errors occurred:
+ntp-servidor: timed out waiting for response
+make: *** [Makefile:28: up] Error 2
+
+```
 
 ---
 
